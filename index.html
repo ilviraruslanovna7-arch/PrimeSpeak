@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrimeSpeak English Academy</title>
+    <!-- Supabase подключение -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+        }
+
+        /* Навигация */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1.5rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            box-shadow: 0 4px 15px rgba(30, 60, 114, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(30, 60, 114, 0.6);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid #1e3c72;
+            color: #1e3c72;
+        }
+
+        .btn-outline:hover {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            margin-bottom: 2rem;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #1e3c72;
+            box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+
+        /* Цвета для оценок */
+        .grade-10, .grade-9 {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .grade-8, .grade-7 {
+            background: linear-gradient(135deg, #17a2b8, #007bff);
+            color: white;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .grade-6, .grade-5, .grade-4 {
+            background: linear-gradient(135deg, #ffc107, #fd7e14);
+            color: white;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .grade-3, .grade-2, .grade-1 {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            font-weight: bold;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        /* Посещаемость */
+        .attendance-present {
+            background: #28a745;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .attendance-late {
+            background: #ffc107;
+            color: #333;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .attendance-absent {
+            background: #dc3545;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Уровни */
+        .level-badge {
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 50px;
+            font-weight: bold;
+            margin-right: 0.5rem;
+        }
+
+        .level-beginner {
+            background: #6c757d;
+            color: white;
+        }
+
+        .level-elementary {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .level-pre-intermediate {
+            background: #007bff;
+            color: white;
+        }
+
+        .level-intermediate {
+            background: #28a745;
+            color: white;
+        }
+
+        .level-upper-intermediate {
+            background: #fd7e14;
+            color: white;
+        }
+
+        .level-advanced {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Прогресс бар */
+        .progress {
+            width: 100%;
+            height: 10px;
+            background: #e1e1e1;
+            border-radius: 5px;
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            transition: width 0.3s;
+        }
+
+        /* Таблицы */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table th {
+            background: #1e3c72;
+            color: white;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* Рейтинг */
+        .rating-1 {
+            background: linear-gradient(135deg, #ffd700, #ffc107);
+            color: #333;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .rating-2 {
+            background: linear-gradient(135deg, #c0c0c0, #adb5bd);
+            color: #333;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        .rating-3 {
+            background: linear-gradient(135deg, #cd7f32, #b85e00);
+            color: white;
+            padding: 0.2rem 0.8rem;
+            border-radius: 50px;
+            font-weight: bold;
+        }
+
+        /* Модальные окна */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2rem;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .close {
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        /* Дашборд */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        /* Группы */
+        .group-card {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .group-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .group-card.active {
+            border: 3px solid #ffc107;
+        }
+
+        .group-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Расписание */
+        .schedule-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e1e1e1;
+        }
+
+        .schedule-time {
+            min-width: 100px;
+            font-weight: bold;
+        }
+
+        .schedule-subject {
+            flex: 1;
+        }
+
+        /* ДЗ */
+        .homework-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .homework-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .homework-meta {
+            display: flex;
+            gap: 1rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Алерты */
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* Загрузка */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #1e3c72;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Бейджи */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-primary {
+            background: #1e3c72;
+            color: white;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Навигация -->
+    <nav class="navbar">
+        <div class="logo">🏫 PrimeSpeak English Academy</div>
+        <div class="nav-buttons" id="navButtons">
+            <button class="btn btn-primary" onclick="showLogin()">Войти</button>
+            <button class="btn btn-outline" onclick="showRegister()">Регистрация</button>
+        </div>
+    </nav>
+
+    <!-- Основной контент -->
+    <div class="container" id="mainContent">
+        <!-- Приветствие -->
+        <div class="card" id="welcomePage">
+            <h1 style="text-align: center; color: #1e3c72; margin-bottom: 1rem;">
+                Добро пожаловать в PrimeSpeak English Academy!
+            </h1>
+            <p style="text-align: center; color: #666; margin-bottom: 2rem;">
+                Профессиональная платформа для изучения английского языка
+            </p>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                    <h3>Группы до 20 чел</h3>
+                    <p>Удобное управление</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                    <h3>Рейтинги</h3>
+                    <p>Топ учеников в группе</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+                    <h3>6 уровней</h3>
+                    <p>От Beginner до Advanced</p>
+                </div>
+                <div style="text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+                    <h3>Расписание</h3>
+                    <p>И ДЗ для каждой группы</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Форма входа -->
+        <div class="card" id="loginForm" style="display: none;">
+            <h2 style="margin-bottom: 1.5rem;">🔐 Вход в систему</h2>
+            <div class="alert alert-error" id="loginError" style="display: none;"></div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" id="loginEmail" placeholder="Введите email">
+            </div>
+            
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" class="form-control" id="loginPassword" placeholder="Введите пароль">
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">
+                Войти
+            </button>
+            <p style="text-align: center; margin-top: 1rem;">
+                Нет аккаунта? <a href="#" onclick="showRegister()" style="color: #1e3c72;">Зарегистрироваться</a>
+            </p>
+        </div>
+
+        <!-- Форма регистрации -->
+        <div class="card" id="registerForm" style="display: none;">
+            <h2 style="margin-bottom: 1.5rem;">📝 Регистрация</h2>
+            <div class="alert alert-error" id="registerError" style="display: none;"></div>
+            
+            <div class="form-group">
+                <label>Полное имя</label>
+                <input type="text" class="form-control" id="registerName" placeholder="Введите имя">
+            </div>
+            
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" id="registerEmail" placeholder="Введите email">
+            </div>
+            
+            <div class="form-group">
+                <label>Пароль</label>
+                <input type="password" class="form-control" id="registerPassword" placeholder="Придумайте пароль">
+            </div>
+            
+            <div class="form-group">
+                <label>Кто вы?</label>
+                <select class="form-control" id="registerRole">
+                    <option value="student">Ученик</option>
+                    <option value="teacher">Учитель</option>
+                </select>
+            </div>
+            
+            <button class="btn btn-primary" style="width: 100%;" onclick="handleRegister()">
+                Зарегистрироваться
+            </button>
+            <p style="text-align: center; margin-top: 1rem;">
+                Уже есть аккаунт? <a href="#" onclick="showLogin()" style="color: #1e3c72;">Войти</a>
+            </p>
+        </div>
+
+        <!-- Панель учителя -->
+        <div id="teacherPanel" style="display: none;">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h2>👨‍🏫 Панель учителя</h2>
+                    <button class="btn btn-outline" onclick="logout()">Выйти</button>
+                </div>
+
+                <!-- Кнопки действий -->
+                <div class="dashboard">
+                    <div class="dashboard-card" onclick="showCreateGroup()">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👥</div>
+                        <h3>Создать группу</h3>
+                        <p>До 20 учеников</p>
+                    </div>
+                    
+                    <div class="dashboard-card" onclick="showAddStudent()">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">👤</div>
+                        <h3>Добавить ученика</h3>
+                        <p>В группу</p>
+                    </div>
+                    
+                    <div class="dashboard-card" onclick="showCreateSchedule()">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📅</div>
+                        <h3>Расписание</h3>
+                        <p>Для группы</p>
+                    </div>
+                    
+                    <div class="dashboard-card" onclick="showCreateHomework()">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📚</div>
+                        <h3>ДЗ</h3>
+                        <p>Задать задание</p>
+                    </div>
+                    
+                    <div class="dashboard-card" onclick="showAddGrade()">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📊</div>
+                        <h3>Оценки</h3>
+                        <p>Поставить</p>
+                    </div>
+
+                    <div class="dashboard-card" onclick="showAttendance()">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📋</div>
+                        <h3>Посещаемость</h3>
+                        <p>Отметить</p>
+                    </div>
+                </div>
+
+                <!-- Список групп -->
+                <h3>📋 Мои группы</h3>
+                <div id="groupsList"></div>
+
+ 
