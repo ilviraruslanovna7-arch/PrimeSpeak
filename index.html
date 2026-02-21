@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -88,9 +89,15 @@
             color: white;
         }
 
-        .btn-warning {
-            background: linear-gradient(135deg, #ffc107, #fd7e14);
+        .btn-save {
+            background: #28a745;
             color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-save:hover {
+            background: #218838;
+            transform: translateY(-2px);
         }
 
         .container {
@@ -143,6 +150,66 @@
             outline: none;
             border-color: #1e3c72;
             box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #666;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .remember-me input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .saved-info {
+            background: #e8f4fd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+            border-left: 4px solid #1e3c72;
+        }
+
+        .clear-btn {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            margin-top: 0.5rem;
         }
 
         /* Цвета для оценок */
@@ -459,47 +526,6 @@
             color: #666;
         }
 
-        /* Алерты */
-        .alert {
-            padding: 1rem;
-            border-radius: 10px;
-            margin-bottom: 1rem;
-        }
-
-        .alert-success {
-            background: #d4edda;
-            color: #155724;
-            border-left: 4px solid #28a745;
-        }
-
-        .alert-error {
-            background: #f8d7da;
-            color: #721c24;
-            border-left: 4px solid #dc3545;
-        }
-
-        /* Загрузка */
-        .loading {
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid #1e3c72;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 1rem;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Бейджи */
         .badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -527,118 +553,112 @@
             background: #dc3545;
             color: white;
         }
+
+        /* Логин страница */
+        .login-container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 0 1rem;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-logo {
+            text-align: center;
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .login-subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
-    <!-- Навигация -->
-    <nav class="navbar">
-        <div class="logo">🏫 PrimeSpeak English Academy</div>
-        <div class="nav-buttons" id="navButtons">
-            <button class="btn btn-primary" onclick="showLogin()">Войти</button>
-            <button class="btn btn-outline" onclick="showRegister()">Регистрация</button>
-        </div>
-    </nav>
+    <!-- ============================================ -->
+    <!-- СТРАНИЦА ВХОДА (ТОЛЬКО ЭТО ВИДНО СНАЧАЛА) -->
+    <!-- ============================================ -->
+    <div id="loginPage">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-logo">🏫 PrimeSpeak</div>
+                <div class="login-subtitle">English Academy · Вход в систему</div>
 
-    <!-- Основной контент -->
-    <div class="container" id="mainContent">
-        <!-- Приветствие -->
-        <div class="card" id="welcomePage">
-            <h1 style="text-align: center; color: #1e3c72; margin-bottom: 1rem;">
-                Добро пожаловать в PrimeSpeak English Academy!
-            </h1>
-            <p style="text-align: center; color: #666; margin-bottom: 2rem;">
-                Профессиональная платформа для изучения английского языка
-            </p>
-            
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
-                    <h3>Группы до 20 чел</h3>
-                    <p>Удобное управление</p>
+                <div class="alert alert-error" id="loginError"></div>
+                <div class="alert alert-success" id="loginSuccess"></div>
+
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label>📧 Email</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="Введите email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🔑 Пароль</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="Введите пароль" required>
+                    </div>
+                    
+                    <div class="form-options">
+                        <label class="remember-me">
+                            <input type="checkbox" id="rememberMe" checked>
+                            <span>Запомнить меня</span>
+                        </label>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-bottom: 1rem;">
+                        🔓 Войти
+                    </button>
+
+                    <button type="button" class="btn btn-save" style="width: 100%;" onclick="saveLoginData()">
+                        💾 Сохранить данные для входа
+                    </button>
+                </form>
+
+                <div id="savedDataContainer" style="display: none; margin-top: 1.5rem;">
+                    <div class="saved-info">
+                        <p><strong>💾 Сохранённые данные:</strong></p>
+                        <p id="savedEmail"></p>
+                        <p id="savedPassword"></p>
+                        <button class="clear-btn" onclick="clearSavedData()">🗑 Очистить</button>
+                    </div>
                 </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
-                    <h3>Рейтинги</h3>
-                    <p>Топ учеников в группе</p>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
-                    <h3>6 уровней</h3>
-                    <p>От Beginner до Advanced</p>
-                </div>
-                <div style="text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
-                    <h3>Расписание</h3>
-                    <p>И ДЗ для каждой группы</p>
+
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px dashed #e1e1e1;">
+                    <p style="color: #666; font-size: 0.8rem; margin-bottom: 0.5rem;">🔐 Тестовый аккаунт:</p>
+                    <p style="font-size: 0.9rem;"><strong>Email:</strong> nurislamovradmir9@gmail.com</p>
+                    <p style="font-size: 0.9rem;"><strong>Пароль:</strong> Teacher2024!</p>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Форма входа -->
-        <div class="card" id="loginForm" style="display: none;">
-            <h2 style="margin-bottom: 1.5rem;">🔐 Вход в систему</h2>
-            <div class="alert alert-error" id="loginError" style="display: none;"></div>
-            
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" id="loginEmail" placeholder="Введите email">
+    <!-- ============================================ -->
+    <!-- ПАНЕЛЬ УЧИТЕЛЯ (СКРЫТА ПОКА) -->
+    <!-- ============================================ -->
+    <div id="teacherPanel" style="display: none;">
+        <!-- Навигация -->
+        <nav class="navbar">
+            <div class="logo">🏫 PrimeSpeak English Academy</div>
+            <div class="nav-buttons">
+                <button class="btn btn-outline" onclick="logout()">Выйти</button>
             </div>
-            
-            <div class="form-group">
-                <label>Пароль</label>
-                <input type="password" class="form-control" id="loginPassword" placeholder="Введите пароль">
-            </div>
-            
-            <button class="btn btn-primary" style="width: 100%;" onclick="handleLogin()">
-                Войти
-            </button>
-            <p style="text-align: center; margin-top: 1rem;">
-                Нет аккаунта? <a href="#" onclick="showRegister()" style="color: #1e3c72;">Зарегистрироваться</a>
-            </p>
-        </div>
+        </nav>
 
-        <!-- Форма регистрации -->
-        <div class="card" id="registerForm" style="display: none;">
-            <h2 style="margin-bottom: 1.5rem;">📝 Регистрация</h2>
-            <div class="alert alert-error" id="registerError" style="display: none;"></div>
-            
-            <div class="form-group">
-                <label>Полное имя</label>
-                <input type="text" class="form-control" id="registerName" placeholder="Введите имя">
-            </div>
-            
-            <div class="form-group">
-                <label>Email</label>
-                <input type="email" class="form-control" id="registerEmail" placeholder="Введите email">
-            </div>
-            
-            <div class="form-group">
-                <label>Пароль</label>
-                <input type="password" class="form-control" id="registerPassword" placeholder="Придумайте пароль">
-            </div>
-            
-            <div class="form-group">
-                <label>Кто вы?</label>
-                <select class="form-control" id="registerRole">
-                    <option value="student">Ученик</option>
-                    <option value="teacher">Учитель</option>
-                </select>
-            </div>
-            
-            <button class="btn btn-primary" style="width: 100%;" onclick="handleRegister()">
-                Зарегистрироваться
-            </button>
-            <p style="text-align: center; margin-top: 1rem;">
-                Уже есть аккаунт? <a href="#" onclick="showLogin()" style="color: #1e3c72;">Войти</a>
-            </p>
-        </div>
-
-        <!-- Панель учителя -->
-        <div id="teacherPanel" style="display: none;">
+        <div class="container">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
                     <h2>👨‍🏫 Панель учителя</h2>
-                    <button class="btn btn-outline" onclick="logout()">Выйти</button>
                 </div>
 
                 <!-- Кнопки действий -->
@@ -684,4 +704,5 @@
                 <h3>📋 Мои группы</h3>
                 <div id="groupsList"></div>
 
- 
+                <!-- Информация о выбранной группе -->
+                <div id="selectedGro
